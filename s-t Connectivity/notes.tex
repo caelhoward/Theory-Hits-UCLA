@@ -1,0 +1,173 @@
+\documentclass[11pt]{article}
+
+% Prefix for numedquestion's
+\newcommand{\questiontype}{Question}
+
+
+% Use this if your "written" questions are all under one section
+% For example, if the homework handout has Section 5: Written Questions
+% and all questions are 5.1, 5.2, 5.3, etc. set this to 5
+% Use for 0 no prefix. Redefine as needed per-question.
+\newcommand{\writtensection}{0}
+
+\usepackage{amsmath, amsfonts, amsthm, amssymb}  % Some math symbols
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\newtheorem{theorem}{Theorem}[section]
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+
+\usepackage{centernot}
+\usepackage{mathtools}
+
+\usepackage{enumitem}
+
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\section{Introduction}
+
+When designing algorithms, there are certain properties of the algorithm that we aim to optimize for. These include:
+\begin{itemize}
+    \item Time
+    \item Space/Memory
+    \item Parallelism
+    \item Power
+    \item Loss/Accuracy
+    \item Determinism / Randomness
+    \item Communication
+\end{itemize}
+The main goal of this class will be focusing on the Space / Memory, Determinism / Randomness, and Communication complexity of algorithms.
+\subsection{Memory Efficiency}
+We define the memory usage of an algorithm based off how much \textit{extra memory} it requires given an input of size $x$. We say that the algorithm as read access to the input $x$ and Read/Write access to any extra space it may need to run.
+
+\section{s-t Connectivity}
+The s-t connectivity problem is defined as follows:
+\begin{itemize}
+    \item Input: $G = (V,E), s, t$ where $s$ is the source node and $t$ is the destination node.
+    \item Output: $\left\{\begin{aligned}
+&\text{YES if } s,t \text{ are connected.}\\
+&\text{NO otherwise.}
+\end{aligned}
+\right.$
+\end{itemize}
+
+The trivial solution to this problem is to perform a BFS or DFS from $s$ to see if $t$ is reachable. This requires a graph representation which is typically assumed to be one of the following:
+\begin{itemize}
+    \item \textbf{Adjacency List}: Each vertex has a corresponding list of vertices that it shares an edge with.
+    \item \textbf{Adjacency Matrix}: An $(|V| = n)^2$ sized matrix denoted as $A$ where $A[i,j] = 1$ if there is a directed edge from vertex $i$ to vertex $j$.
+\end{itemize}
+\subsection{Basic algorithm}
+The basic algorithm using BFS is as follows
+\begin{algorithm}[H]
+\caption{Graph Reachability}
+\begin{algorithmic}[1]
+\State $\text{Flag}[u] \gets 0 \quad \forall u$
+\State $\text{Flag}[s] \gets 0$
+\State $Q \gets [s]$
+\While{$Q \neq \emptyset$}
+    \State remove $v$ from $Q$
+    \For{each neighbor $u$ of $v$}
+        \If{$\text{Flag}[u] = 0$}
+            \State add $u$ to $Q$
+        \EndIf
+    \EndFor
+    \State $\text{Flag}[v] \gets 1$
+\EndWhile
+\If{$\text{Flag}[t] = 1$}
+    \State \textbf{output YES}
+\Else
+    \State \textbf{output NO}
+\EndIf
+\end{algorithmic}
+\end{algorithm}
+The running time of this algorithm is $O(|V| + |E|)$. The Memory usage is dependent on the Flag array which requires $|V|$ extra bits. (Ask why this is the bound since the algorithm needs $\log(|V|)$ bits to represent nodes).
+
+\subsection{Memory Efficient s-t Connectivity}
+Questions were raised wondering if there was a more memory efficient version of BFS that solved this problem and if so, what is the least memory needed to solve s-t connectivity.
+
+\begin{theorem}[1980s]
+    There is a randomized algorithm with $5\log |v|$ bits of additional memory to solve $s-t$ connectivity problem that runs in $O(n^3)$ runtime.
+\end{theorem}
+\newpage
+\textbf{Random Walk Algorithm}
+\begin{itemize}
+    \item $\text{Counter} \gets 0$
+    \item $v \gets s$
+    \item \textbf{while} $\text{Counter} \le T$:
+    \begin{itemize}
+        \item \textbf{if} $v = t$ \textbf{then return YES}
+        \item \textbf{else}
+        \begin{itemize}
+            \item $v \gets$ a random neighbor of $v$
+            \item $\text{Counter} \gets \text{Counter} + 1$
+        \end{itemize}
+    \end{itemize}
+    \item \textbf{return NO}
+\end{itemize}
+
+The bits needed are for current vertex $v (\log n), \text{ Counter } (\log T), \\ \text{Bits needed for random sampling } (\log n)$.
+
+The above algorithm uses the following result:
+\begin{theorem}
+    For all graphs, if $s,t$ are connected: $$\mathbb{E}[\text{Time random walk from s hits t }] = O(n^3)$$
+\end{theorem}
+\subsection{Notes and History}
+The above algorithm and proof led to the question of whether or not we can get a \textbf{logspace} algorithm for directed s.t. connectivity \textbf{without randomness}?
+\bigskip
+
+The reason that this question holds significance in complexity theory is its implications on computational ability. s-t Connectivity is a problem that is $NL$ (Nondeterministic Logarithmic Space) Complete. This has the following implication:
+\begin{theorem}
+    If directed $s-t$ connectivity can be solved with $O(\log |V|)$ bits of memory (and no randomness) $\Longrightarrow$ Any randomized algorithm can be made deterministic at the expense of a constant-factor increase in memory (and polynomial slow-up in time).
+\end{theorem}
+
+In 2005, Omer Reingold proved that $s.t$ connectivity on undirected graphs can be solved with $O(\log |v|)$ extra memory. This is the first big hit for this class.
+
+\section{Spectral Graph Theory}
+To construct an algorithm that solves $s.t$ connectivity, we use an adjaceny matrix. We also need the following definitions.
+
+\begin{definition}
+    We say a graph is $D-$regular if all the vertices have the same degree $D$.
+\end{definition}
+\begin{definition}
+    A Normalized Adjacency Graph, denoted as $M_a = \frac{A_G}{D}$. This means the sums of the matrix add to $1$.
+\end{definition}
+( I don't really know how these relate, ask professor next lecture )
+
+\begin{theorem}[SGT Theorem 1]
+    If $G$ is regular. Then:
+    \begin{enumerate}
+        \item $1$ is an eigenvalue of $M_G$
+        \item $G$ is connected $\Longleftrightarrow$ eigenvalue of $1$ is unique
+    \end{enumerate}
+\end{theorem}
+
+\begin{proof}(1)
+    To demonstrate the first part of the theorem, we simply need to show a vector that, when multiplied by $M_G$, remains the same. Consider the $\vec{1}$ (All $1$'s vector). Since the matrix is normalized, the sum of all entries of a particular row is $$\sum_{i=1}^{d} \frac{1}{d} = 1$$Thus, $\vec{1}$ multiplied by this matrix must result in a $1$ for every row which gives us back the $1$ vector
+\end{proof}
+
+We prove the second part of the theorem in two parts.
+\begin{enumerate}
+    \item All eigenvalues are less than or equal to $1$
+    \item If the graph is disconnected, the eigenvalue 1 appears at least twice in the eigenvalues of the matrix
+\end{enumerate}
+\begin{proof}(2a)
+    To demonstrate that all eigenvalues are less than or equal to 1, consider $v_{i*}$, the largest entry in $v$ in absolute value. We will show that this value cannot increase as a result of the matrix multiplication.
+    \begin{align*}
+        \lambda v_{i*} &= \sum_{j=1}^n M[i,j]\cdot v_j\\
+        |\lambda| \cdot |v_{i*}| &= | \sum_{j=1}^n M[i,j] \cdot v_j |\\
+        & \leq \sum_{j=1}^{n} M[i,j] \cdot |v_j| \\
+        &\leq \sum_{j=1}^{n} M[i,j] \cdot |v_{i*}|\\
+        &= |v_{i*}| \cdot \sum_{j=1}^{n} M[i,j] \\
+        &= |v_{i*}| \cdot 1
+    \end{align*}
+    Here we see that based on the normalized rows, the max entry in the vector cannot increase in magnitude. This implies that the absolute value of $\lambda$ must be less than or equal to 1.
+\end{proof}
+
+To prove that a disconnected graph has at least 2 eigenvectors with eigenvalue 1, consider the structure of a matrix that represents a disconnected graph. This would be a \textbf{block structure} meaning that it would contain two squares in the matrix that correspond to the connected components of the graph. In this case, the vectors of only $1$'s for those particular entries would result in the same vector when multiplied by that matrix. (Look at notes for this better intuition).
+
+
+\end{document}
