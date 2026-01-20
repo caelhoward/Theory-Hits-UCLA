@@ -14,6 +14,7 @@
 \usepackage{mathtools}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{dsfont}
 
 \newtheorem{theorem}{Theorem}[section]
 \theoremstyle{definition}
@@ -157,7 +158,7 @@ We prove the second part of the theorem in two parts.
 \begin{proof}(2a)
     To demonstrate that all eigenvalues are less than or equal to 1, consider $v_{i*}$, the largest entry in $v$ in absolute value. We will show that this value cannot increase as a result of the matrix multiplication.
     \begin{align*}
-        \lambda v_{i*} &= \sum_{j=1}^n M[i,j]\cdot v_j\\
+        \lambda \cdot v_{i*} &= \sum_{j=1}^n M[i,j]\cdot v_j\\
         |\lambda| \cdot |v_{i*}| &= | \sum_{j=1}^n M[i,j] \cdot v_j |\\
         & \leq \sum_{j=1}^{n} M[i,j] \cdot |v_j| \\
         &\leq \sum_{j=1}^{n} M[i,j] \cdot |v_{i*}|\\
@@ -169,5 +170,65 @@ We prove the second part of the theorem in two parts.
 
 To prove that a disconnected graph has at least 2 eigenvectors with eigenvalue 1, consider the structure of a matrix that represents a disconnected graph. This would be a \textbf{block structure} meaning that it would contain two squares in the matrix that correspond to the connected components of the graph. In this case, the vectors of only $1$'s for those particular entries would result in the same vector when multiplied by that matrix. (Look at notes for this better intuition).
 
+\subsection{Finalizing Proof (Lecture 2 Start)}
+\textbf{Claim}: $G$ is connected and has self-loops $\Rightarrow$ All eigenvalues except the one corresponding to the $\mathds{1}$ are $< 1$.
+\bigskip
 
+Recall a D-normalized matrix has $D$ entries in every row and column that sum to one. To prove the above claim, we focus on the following properties of $M_G$:
+\bigskip
+
+If $G$ is a connected $D$-regular graph:
+\begin{itemize}
+    \item $\langle v, \mathds{1}\rangle = 0$ for any eigenvector $v \neq \mathds{1}$. For symmetric matrices, the eigenvectors are always orthogonal to one another.
+    \item $M_G \cdot v = \lambda \cdot v$ for every eigenvector $v$ for some eigenvalue $\lambda$
+\end{itemize}
+We use these facts to demonstrate that all other eigenvalues are less than $1$ in $M_G$. 
+
+\subsubsection{Graph Connectivicty Properties}
+If a graph $G$ is connected, we can partition the vertices of the graph into to disjoint sets $P$ and $N$ such that there is an edge connecting at least one vertex from $P$ to a vertex in $N$. Therefore, we split any eigenvector into two sets as follows:
+\begin{itemize}
+    \item $P = \{ i : v_i \geq 0\} \neq \emptyset$
+    \item $N = \{ i : v_i < 0\} \neq \emptyset$
+\end{itemize}
+In other words, $P$ is the set of all vector entries that are non-negative and $N$ is the set of all vector entries that are negative. Recall that:
+$$\langle\mathds{1}, v \rangle= 0$$
+Which means that the sum of all entries of the eigenvector must be $0$. Since $v$ is not the zeros vector, we can infer that some entries of $v$ must be posititve and some must be negative. This allows us to make the above claim that $P$ and $N$ are both nonempty sets.
+\subsubsection{Showing the Contradiction}
+We now show that any eigenvalue must be less than $1$. First we rewrite the equation as follows:
+\begin{align*}
+(M_G \cdot v)_i &= \lambda \cdot v_i\\
+\lambda \cdot v_i &= \sum_j M_G[i,j] \cdot v_j
+\end{align*}
+We consider the sum of all of the positive entries of the matrix, following the eigen value multiplication we get:
+\begin{align*}
+\lambda \sum_{i\in P} v_i &= \sum_{i \in P}\sum_j M_G[i,j] v_j
+\end{align*}
+In other words, if we take the sum of all positive entries in $v$, and multiply them by the vector's eigenvalue, we should get the same value when summing all the dot products of the eigenvector with the rows of $M_G$ that correspond to positive entries in $v$. Observe that since we are taking a summation over terms, we are allowed to rewrite the summation relatively freely. We rewrite the above as follows:
+\begin{align*}
+    \lambda \sum_{i\in P} v_i &= \sum_{j=1}^n v_j \sum_{i \in P}M_G[i,j]\\
+    &= \sum_{j \in P}v_j\sum_{i \in P}M_G[i,j] + \sum_{j \in N}v_j\sum_{i \in P}M_G[i,j]
+\end{align*}
+Since the sum of all entries of a row is $1$, we can deduce that the above summation is:
+$$\leq \sum_{j\in P}v_j \cdot 1 + \sum_{j \in N}v_j\sum_{i \in P}M_G[i,j]$$
+Furthermore, since there is at least one edge connecting $P$ to $N$, we know that at least one $M_G[i,j]$ is non-zero, meaning that the second part of the summation must account for some negative value. We can therefore conclude that the above summation must be strictly $$< \sum_{j\in P}v_j \cdot 1$$This demonstrates that the eigenvalue for any eigenvector $v$ must be strictly less than one if $v \neq \mathds{1}$ as the sum of the positive entries after multiplying the vector by the matrix must be strictly less than their original sum.
+\subsection{Theorem 2}
+We extend on the above proof with the following theorem:
+\begin{theorem}[SGT Theorem 2]
+    $G$ is a connected, regular, and has self-loops. Then:
+    \begin{enumerate}[label=(\alph*)]
+        \item 1 is an eigenvalue
+        \item All other eigenvalues $< 1$ in absolute value. (Exercise)
+    \end{enumerate}
+\end{theorem}
+The self loops just means that there are ones across the diagonal of the matrix. 
+
+\section{Spectral Properties of Graphs}
+\begin{theorem}[Eigenvalue Decomposition Theorem]
+    Any symmetric matrix $M \in \mathbb{R}^{n \times n}$ has:
+    \begin{itemize}
+        \item $n$ eigenvalues: $\lambda_1 \geq \lambda_2 \geq ... \geq \lambda_n$
+        \item $n$ eigenvectors: $v_1, v_2, ..., v_n$ that are orthonormal meaning $\langle v_i, v_i \rangle = 1$ and $\langle v_i, v_j \rangle = 0$ if $i \neq j$
+        \item $M = 
+    \end{itemize}
+\end{theorem}
 \end{document}
