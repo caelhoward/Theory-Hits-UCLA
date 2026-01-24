@@ -19,6 +19,7 @@
 \newtheorem{theorem}{Theorem}[section]
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[section]
+\newtheorem{lemma}[theorem]{Lemma}
 
 \usepackage{centernot}
 \usepackage{mathtools}
@@ -228,7 +229,282 @@ The self loops just means that there are ones across the diagonal of the matrix.
     \begin{itemize}
         \item $n$ eigenvalues: $\lambda_1 \geq \lambda_2 \geq ... \geq \lambda_n$
         \item $n$ eigenvectors: $v_1, v_2, ..., v_n$ that are orthonormal meaning $\langle v_i, v_i \rangle = 1$ and $\langle v_i, v_j \rangle = 0$ if $i \neq j$
-        \item $M = 
+        \item $M = \lambda_1 \cdot v_1 \cdot v_1^T + \lambda_2 \cdot v_2 \cdot v_2^T + ... + \lambda_n \cdot v_n \cdot v_n^T$
     \end{itemize}
 \end{theorem}
+If $G$ is regular, then $M_G$ has eigenvalues:
+$$1 = \lambda_1(G) \geq \lambda_2(G) \geq ... \geq \lambda_n(G) \geq -1$$
+\begin{theorem}[SGT Theorem 2]
+    $G$ is regular and has self loops $\Rightarrow$ \\$\max(|\lambda_2(G)|, |\lambda_3(G)|,..., |\lambda_n(G)|) < 1$
+\end{theorem}
+
+We define the following to use in our proof. If $G$ is regular,
+$$\lambda(G) = \max(|\lambda_2(G)|, |\lambda_3(G)|, ...,|\lambda_n(G)|)$$
+and the "Spectral Gap of $G" = 1-\lambda(G)$
+\begin{theorem}
+    SGT Theorem 2: $G$ is regular, has self loops, and is connected $\Longleftrightarrow$ Spectral Gap of $G > 0$. 
+\end{theorem}
+We care about the spectral gap of a graph $G$ cause it represents how connected a graph is. The more connected a graph is, the spectral gap will be close to one with disconnected graphs having gaps close to 1.
+\bigskip
+
+\textbf{Notation:} $G$ is a $(N,D,\lambda)$ graph (has self-loops) if:
+\begin{itemize}
+    \item $G$ has $N$ vertices
+    \item $G$ is $D-$regular
+    \item The Spectral gap $\geq 1-\lambda$ or $\lambda(G) \leq \lambda$.
+\end{itemize}
+
+\begin{theorem}[SGT Theorem 3:]
+    $G$ is a $(N,D,\lambda)$-graph $\Longrightarrow$ for any two vertices $s,t$ in $G$, the shortest path between them $\leq \lceil \log_{1/\lambda}N\rceil + 1$.
+\end{theorem}
+
+For example, if $\lambda \leq 1/2$, any two vertices are connected by $\leq \lceil\log_2N\rceil + 1$ path. We do not prove this theorem but we have the following sketch:
+\subsubsection{Sketch of SGT Theorem $3$}
+Consider the Eigenvalue Decomposition representation of $M_G$:
+$$M_G = 1 \cdot \mathds{1} \cdot \mathds{1}^\top + \lambda_2 \cdot v_2 \cdot v_2^\top + ... + \lambda_N \cdot v_N \cdot v_N^\top$$
+Now, when we take powers of a matrix, the eigenvalues get magnified:
+$$M_G^k = 1 \cdot \mathds{1} \cdot \mathds{1}^\top + \lambda_2^k \cdot v_2 \cdot v_2^\top + ... + \lambda_N^k \cdot v_N \cdot v_N^\top$$
+Now we have a sum of matrices where the first matrix is a bunch of $1/\sqrt{N}$ entries and the other terms decay exponentially since the $\lambda$ values should always be low. If we have $\lambda = \frac{1}{2}$ and $k = 2\log N$, the lambda becomes less than $1/N^2$. For any specific entry, we have:
+$$\frac{1}{N} \pm (\frac{1}{N^2} \pm \frac{1}{N^2} + ...)$$
+We can therefore say that $M_G^k > 0$ for all $M_G^k[i,j]$.
+
+\subsubsection{Diameter of Graph}
+We define $\Delta(G)$ as:
+\[
+\delta(G) \;=\;
+\begin{cases}
+\infty, & \text{if } G \text{ is disconnected}, \\[6pt]
+\max_{s,t \in V(G)} \operatorname{dist}_G(s,t), & \text{otherwise},
+\end{cases}
+\]
+\textbf{Expander Graphs}: $\lambda \leq 1/2$ implies Diameter is small. Also implies lots of "redundancies" meaning any subset of vertices has lots of edges connecting them. More formally:
+$$\forall S, |S| < 0.1 n,\text{ and lots of edges leave } S$$
+
+\subsection{USTCON Revisited}
+Consider the case where we are promised that the connected components of $G$ have small diameter.
+$$\Delta(\text{Components}) \leq T$$
+Now we know that either $s,t$ are not connected or that there is a path of length $\leq T$. Using this, we use the brute force algorithm to solve $s-t$ connectivity as follows.
+\begin{enumerate}
+    \item Explore all paths of lengtth $\leq T$ from $s$
+    \item If you reach $t$ in these explorations we output YES.
+    \item If Not, output NO
+\end{enumerate}
+The way we do this is simply having an algorithm that enumerates an ordering of the neighbors of each vertex.
+\bigskip
+
+Graph $G$ is represented as:
+\begin{itemize}
+    \item Vertex 1: [...]
+    \item Vertex 2: [...]
+    \item Vertex 3: [...]
+    \item Vertex 4: [...]
+\end{itemize}
+
+The algorithm looks something like this:
+\begin{algorithm}
+\caption{Reachability via bounded walks}
+\begin{algorithmic}[1]
+\State $\textit{current} \gets S$
+\For{each sequence $(i_1,i_2,\dots,i_T) \in [D]^T$}
+    \State $\textit{current} \gets S$
+    \For{$\ell = 1$ to $T$}
+        \State $\textit{current} \gets$ the $i_\ell$-th neighbor of $\textit{current}$
+        \If{$\textit{current} = t$}
+            \State \Return YES
+        \EndIf
+    \EndFor
+\EndFor
+\State \Return NO
+\end{algorithmic}
+\end{algorithm}
+
+\textbf{Total memory}:
+\begin{itemize}
+    \item ($s$, current, $t$) : $O(\log N)$ 
+    \item Sequence: $T \cdot \log_2D$
+    \item $l$: $\log T$ bits
+\end{itemize}
+\textbf{Memory:} $O(\log N + T\log_2D)$ bits
+\bigskip
+
+\textbf{Time:} $O(D^T \cdot T)$
+\bigskip
+
+So we can solve USTCON problem with the above space and time complexity. Note that if we can reduce a graph with logarithmic diameter and constant degree, we have generated an algorithm that solves USTCON in logspace and polynomial time. To do this, we are going to make it so every connected component is extremely well connected.
+\bigskip
+
+\textbf{Target:} Reduce to the case where:
+\begin{itemize}
+    \item $D$ is a constant
+    \item Every connected component has $\lambda(G) \leq \frac{1}{2}$
+\end{itemize}
+Brute force alg: Memory: $O(\log N)$, Runtime: $N^{O(1)}$
+\bigskip
+
+\textbf{Reingold's Idea/Algorithm}
+
+$(G,s,t) \rightsquigarrow (\bar{G}, \bar{s}, \bar{t})$ where $s,t$ are connected in $G \Leftrightarrow \bar{s},\bar{t}$ are connectd in $\bar{G}$
+\begin{itemize}
+    \item $\lambda(\bar{G}) < \lambda(G)$
+    \item Degree($\bar{G}$) $\approx$ Degree($G$)
+\end{itemize}
+The general reduction to reduce degree of $G$ to $\bar{G}$ where $\bar{G}$ is a $4-$regular graph. We do so by increasing the number of vertices and decreasing the degree. For each edge, we break each old edge into two vertices at the endponits. Connect these new vertices so each vertex in $G$ gets $D$ new vertices to represent it, and each of those vertices are conected in a cycle. The degree of these new vertices is now $3$ and we add a self-loop to make it $4$.
+
+\section{Reducing General Graphs (Lecture 3)}
+\textbf{Goal:} Need operations that are computable in logspace to improve the diameter (spectral gap), reduce the second largest eigenvalue.
+\bigskip
+
+\textbf{Diameter:} $O(\log_{1/\lambda}N)$
+\bigskip
+
+We can decrease the eigenvalues $\lambda_2,..., \lambda_n$ by increasing the connectivity of the graph. We add "shortcut" edges that add edges from any vertex to all vertices distance 2 away. This will decrease the diameter by at least a factor of 2. We generate this by squaring the graph, taking adjaceny matrix $A_G$ and generating $\bar{G} = A_G^2$. We have the following:
+$$(N,D,\lambda) \rightsquigarrow (N, D^2, \lambda^2)$$
+This follows as the degree increases by a multiplicative factor of $D$ since there should be $D$ neighbors of each of vertices $D$ neighbors.
+\bigskip
+
+\textbf{Squaring:} If $(u,v) \& (v,w)$ are edges, add new edge $(u,w)$
+\bigskip
+
+\begin{lemma}
+    If $G$ is a $(N,D,\lambda)$ graph and $G^2$ is a $(N,D^2,\lambda^2)$ graph. The brute force search yields the following memory requirement:
+    \begin{itemize}
+        \item $G$: $\log_2N + \log D \cdot \log_{1/\lambda}N$
+        \item $G^2$: $\log_2N + \log D^2 \cdot \log{1/\lambda^2}N$
+    \end{itemize}
+\end{lemma}
+We aim to find a "powering operation" that improves the spectral gap while not blowing up the degree as much.
+
+\subsection{Reingold's Algorithm}
+Select $H$: A special graph generated from $$(G,s,t) \rightsquigarrow (G^2 \circledcirc H, \bar{s}, \bar{t})$$
+The main idea is squaring $G$ to decrease $\lambda$, and then applying the $\circledcirc$ operation to decrease the degree. We repeat the above operation until we get a graph we can use to perform the algorithm. We define this recursively as follows:
+$$G_{i+1} = G_i^2 \circledcirc H$$
+\section{Zig-Zag Product}
+We need the following to hold:
+\begin{itemize}
+    \item $G$ is a $(N,D,\lambda_G)$-graph
+    \item $H$ is a $(D,D_1,\lambda_H)$-graph
+\end{itemize}
+We use something called \textbf{Consistent Labeling}. For a $D$ regular graph, a consistent labeling is a mapping $L: [E] \rightarrow \{1,...,D\}$ such that each vertex has all of its outgoing edges getting distinct labels.
+\bigskip
+
+Consider $G$ as a $4-$regular graph consistently labeled. We generate $H$ as a $2$-regular graph on 4 vertices. The zig-zag product is applied as follows:
+\begin{itemize}
+    \item Every vertex in $G$ gets replaced with a copy of $H$.
+    \item Degree of $G \circledcirc H$ is always going to be $D_1^2$.
+\end{itemize}
+To define this new degree $D_1^2$, we consider $[D_1] \times [D_1]$. Every edge in $G \circledcirc H$ corresponds to a pair of $(k_1,k_2) \in [D_1] \times [D_1]$. The edges are defined as follows:
+\begin{itemize}
+    \item We take the edge labeled $k_1 = (u,v)$ from vertex $u$ in $H$.
+    \item From vertex $v$, we take the edge labled $v$ in $G$ to go to the corresponding cloud.
+    \item We take a final step from the new cloud's vertex $v$ to the vertex it is connected to by edge $k_2$. (I would look at notes for this) (Review how this works!)
+    \item We only keep the edge from the starting $u$ vertex from a copy of $H$ to the final vertex 
+\end{itemize}
+The algorithm for computing the edges is as follows. $H = (D,D_1,-)$ graph:
+\begin{enumerate}
+    \item For every new vertex $(u,a) \& (k_1,k_2)\in [D_1] \times [D_1]$
+    \item Take a within cloud step according to $k_1$ to get to $(u,b)$
+    \item Take an across cloud step. Let $v$ be the $b^{th}$ neighbor of $u$ in $G$. Jump to $(v,b)$
+    \item Take edge labeled $k_2$ from $b$ within the cloud: $(v,b')$.
+    \item This results in us connecting $(u,a)$ to $(v,b')$ with edge label $(k_1,k_2)$.
+\end{enumerate}
+
+\begin{definition}[Rotation Map]
+    A \textbf{Rotation Map} of a graph \\$G: (N,D,-)$ is defined as:
+    $$Rot_G: [N] \times [D] \rightarrow [N] \times [D]$$
+    So $Rot(v,i) = (w,j)$ where $w$ is the $ith$ neighbor of $v$ and $v$ is the $j^{th}$ edge out of $w$.
+\end{definition}
+Given $G: (N,D,-)$-graph and $H:(D,D_1,-)-$graph, we get $G \circledcirc H: (ND,D_1^2, -)$
+\bigskip
+
+ZigZag takes as input:
+\begin{itemize}
+    \item $Rot_G: [N] \times [D] \rightarrow [N] \times [D]$
+    \item $Rot_H: [D] \times [D_1] \rightarrow [D] \times [D_1]$
+\end{itemize}
+And outputs $Rot_{G \circledcirc H}: [ND] \times [D_1^2] \rightarrow [ND] \times [D_1^2]$. We create this transformation by doing the following:
+\bigskip
+
+$Rot_{G \circledcirc H}((u,a),(k_1,k_2))$:
+\begin{itemize}
+    \item $(b,k_1') \longleftarrow Rot_H(a,k_1)$ 1st cloud step
+    \item $(v,c) \longleftarrow Rot_G(u,b)$ between cloud step
+    \item $(d,k_2') \longleftarrow Rot_H(c,k_2)$ 2nd cloud step
+\end{itemize}
+Output: $((v,d), (k_2', k_1'))$
+\bigskip
+
+To understand what the above transformation is, we need to analyze what the original rotation as well as the sub rotations are asking for. To get a rotation map of a node in the new graph $G \circledcirc H$, we can conceptualize it as labelling the cloud corresponding to $u$, as well as the starting node corresponding to the edge of $u$ that it is coming out of. For example, $(u,a)$, corresponds to the cloud that represents node $u$ in $G$ and the corresponding node $a$ in $H$ that represents the $a^{th}$ edge coming out of $u$. The second tuple $[D_1^2]$, corresponds to the edges in $H$ that should be followed out of the cloud for $u$, say $(k_1, k_2)$. As previously explained, the $k_1^{th}$ edge out of the node that corresponds to $a$ in $H$ should be taken to the new edge in $H$, say node $b$. Now, we take the edge from that node $b$ to the corresponding cloud of $v \in G$. From the edge labeled $b$ in this cloud, we take the $k_2^{th}$ edge to a new node say $c$. This is essentially what the above transformation is explaining. More succinctly, we analyze the final output $((v,d),(k_2',k_1')) \longleftarrow Rot_{G\circledcirc H}((u,a),(k_1,k_2))$. Firstly, we can see that we are going from the cloud reprsenting $u$ to the cloud representing $v$ so it makes sense that we end up in cloud $v$. To get the node $d$ in $H$, we follow the path from $a$ in the cloud for $u$. First, it takes the $k_1^{th}$ edge in $H$ to get to node $b$. It now has to take a step from this node $b$ to the correct node in the cloud for $v$. We say that $v$ is the $b^{th}$ neighbor of $u$ and $u$ is the $c^{th}$ neighbor of $v$. Because of this, the rotation mapping has to return the node representing the $c^{th}$ neighbor in cloud $v$. From here, we need to take the $k_2^{th}$ edge from this $c$ node to the final node $d$, which gives us the resulting $(v,d)$ tuple. For the second tuple, we need to konw how to get from $(v,d)$ back to $(u,a)$. For this, we need the $k_1', k_2'$ values that simulate the previously mentioned path back to $(u,a)$. Following the logic, we need to go back from the $d^{th}$ node in the cloud to the $c^{th}$ node which would be the $k_2'^{th}$ neighbor of $d$, and from there we step back to the cloud for $u$ where we are now at the node labeled $b$, which we then take its $k_1'^{th}$ edge to get back to $a$ explaining the $(k_2',k_1')$ part of the tuple.
+
+\begin{theorem}[Rozenman, Vodham 05, RVW01]
+    $G \circledcirc H$ is a $(ND, D^2, \lambda)$-graph where.
+    $$\lambda \leq 1-(1-\lambda_H)^2(1-\lambda_G)$$
+\end{theorem}
+Intuitively, if $G,H$ have small $\lambda$'s, then $G\circledcirc H$ also has small $\lambda$ and degree of $G \circledcirc H$ is smaller than degree of $G$. The degree is smaller and the spectral gap is slightly worse.
+\bigskip
+
+\begin{lemma}
+    If $s,t$ are in disconnected parts of $G$, the clouds of $s,t$ in $G \circledcirc H$ will still be disconnected.
+\end{lemma}
+
+\section{Expander Graphs}
+There are numerous definitions for expander graphs that are all equivalent:
+\begin{definition}
+    Consider a graph that has $N$ vertices and is $D$-regular. The combinatorial definition of expansion is to say that for any big set of vertices $S$ such that $S \subset [N], |S| \leq N/3$, the number of edges from $S$ to $\bar{S}$ is at least $(0.4)D\cdot |S|$. So to disconnect $S$ from the rest of the graph, we would need to cut at least that many edges.
+\end{definition}
+
+Another definition for exander graphs that is equivalent is saying that the second largest eigenvalue in absolute value is less than or equal to $0.1$. (These constants are made up). This also implies the diameter is very very small.
+\bigskip
+
+\subsection{History}
+Until around 2001, we only had such graphs where $D$ is a constant from deep number theoretic results. The construction of a more combinatorial version of expander graphs is by starting with two small expanders $G_0, H$ and generating new graphs as follows:
+$$G_{i+1} = G_i^2 \circledcirc H$$
+You can also tensor $G_i$.
+
+\section{Lecture 4, Main Spectral Theorem for ZigZag}
+\begin{theorem}[Rozenmann, Vadhan 05, RVW01]
+    $G \circledcirc H$ is a $(ND,D_1^2, \lambda)$-graph where:$$\lambda \leq 1-(1-\lambda_H)^2(1-\lambda_G)$$
+    Or equivalently:
+    $$(1-\lambda_H)^2(1-\lambda_G) \leq 1-\lambda$$
+\end{theorem}
+Let $F = G \circledcirc H$. $F$ has $N \cdot D$ many vertices. To help visualize this, think of these $ND$ vertices as blocks of $D$ vertices. Each row/col in the final matrix can be though of as $(1,a),(1,b) ..., (2,a),(2,b),...(N,1)..(N,D)$. The total matrix will be $[(N,D)] \times [(N,D)]$.
+\bigskip
+
+We take an "edge hop" from an edge according to $H$ to and edge according to $G$ to a final edge according to $H$. We can think of this as three matrices that are $N \times D$ in size:
+\begin{itemize}
+    \item The left and rightmost matrices represents the within cloud steps. Each diagonal entry represents a copy of matrix $H$. This tells where to step within the cloud.
+    \item The intercloud step matrix in the middle, which we will call $P$, represents the transition from a particular cloud to another. It is a permutation matrix that transitions a particular node $(u,b)$ to the cloud representing the $b^{th}$ neighbor of $u$ say $v$.
+\end{itemize}
+We now have a very nice representation of matrix $F$ as the product of three matrices. The Zig-Step can further be simplified as the tensor product of $(\mathbf{I}_n \otimes A_H) \cdot P_G \cdot (\mathbf{I}_n \otimes A_H)$. We write the normalized adjaceny matrix as:
+\begin{align*}
+    A_F = \frac{A_F}{D_1^2} &= \mathbf{I}_N \otimes \frac{A_H}{D_1} \cdot P_G \cdot \mathbf{I}_N \otimes \frac{A_H}{D_1}\\
+    &= \mathbf{I}_N \otimes M_H \cdot P_G \cdot \mathbf{I}_N \otimes M_H
+\end{align*}
+\newpage
+\textbf{Goal:} $M_F = (\mathbf{I}_N \otimes M_H) \cdot P_G \cdot (\mathbf{I}_N \otimes M_H)
+\Longrightarrow \lambda_F \leq 1-(1-\lambda_H)^2\cdot (1-\lambda_G)$ where $\lambda_F$ is the second largest eighenvalue for $M_F$.
+
+\begin{lemma}
+    $G$ is an $(N,D,\lambda)$ graph. We know that
+    \begin{itemize}
+        \item $1$ is an eigenvalue and the all $1$'s vector is an eigenvector
+        \item All other eigenvalues are less than $\lambda$ in absolute value (definition)
+    \end{itemize}
+    $M_G = 1 \cdot \frac{1}{N}\mathds{1} \mathds{1}^\top + \lambda_2 \cdot v_2 \cdot v_2^top + ... + \lambda_n \cdot v_n \cdot v_n^\top$
+    The first matrix is $\frac{1}{N}$ times the all 1's matrix.
+    \bigskip
+    We rewrite
+    $$M_G = \frac{1-\lambda}{N} \mathbf{1}^{n\times n} + \frac{\lambda}{N}\mathbf{1}^{n \times n} + \lambda_2 \cdot v_2 \cdot v_2^\top$$
+    We view the terms that are not $\frac{1-\lambda}{N} \mathbf{1}^{n\times n}$ as error.
+    Continuing from the lemma, we rewrite $M_G$ as:
+    $$M_G = (1-\lambda)\frac{J_N}{N} + \lambda \cdot E$$
+    Where $||E|| \leq 1$. The \textbf{spectral norm} for any symmetric matrix, $A, ||A|| = $ largest abs-value of an eigenvalue of $A$. We restate the lemma:\\
+    \textbf{Lemma:} A graph $G$ is an $(N,D,\lambda)$-graph $\Longleftrightarrow$ it can be rewritten as mentioned above.
+    \bigskip
+
+    To prove the first direction, suppose we rewrite the graph as:
+    $$M_G = \frac{1-\lambda}{N} \mathbf{1}^{n\times n} + \frac{\lambda}{N}\mathbf{1}^{n \times n} + \lambda_2 \cdot v_2 \cdot v_2^\top...$$
+    We know that the second through $n$th terms form another matrix $E$, so we rewrite it as:
+    $$\frac{1-\lambda}{N} \cdot J + E$$
+    We know that $||E|| \leq \lambda$ since it is an $(N,D,\lambda)$ graph by definition. The other direction is not gonna be proven!
+\end{lemma}
 \end{document}
