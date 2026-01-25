@@ -505,6 +505,88 @@ We now have a very nice representation of matrix $F$ as the product of three mat
     $$M_G = \frac{1-\lambda}{N} \mathbf{1}^{n\times n} + \frac{\lambda}{N}\mathbf{1}^{n \times n} + \lambda_2 \cdot v_2 \cdot v_2^\top...$$
     We know that the second through $n$th terms form another matrix $E$, so we rewrite it as:
     $$\frac{1-\lambda}{N} \cdot J + E$$
-    We know that $||E|| \leq \lambda$ since it is an $(N,D,\lambda)$ graph by definition. The other direction is not gonna be proven!
-\end{lemma}
+    We know that $||E|| \leq \lambda$ since it is an $(N,D,\lambda)$ graph by definition. The other direction is not gonna be proven! Furthermore, we rewrite the matrix as:
+    $$M_G = (1-\lambda)\frac{J_N}{N} + \lambda \cdot \frac{\tilde{E}}{\lambda}$$
+    \begin{lemma}
+        $A,B \in \mathbb{R}^{n\times n}$ symmetric
+        \begin{itemize}
+            \item $|| A + B || \leq ||A|| + ||B||$
+            \item $||A \cdot B|| \leq ||A|| \cdot ||B||$
+            \item $||A \otimes B|| = ||A|| \cdot ||B||$
+        \end{itemize}
+        This means that the sum largest eigenvalues of two symmetric matrices is at most the sum of the two largest eigenvalues. Same with product. The last fact can be intuitively though of since the eigenvalues of $A \otimes B$ will always be $\lambda_i(A) \cdot \lambda_j(B)$ for all $i,j$ products of eigenvalues of $A$ and $B$.
+    \end{lemma}
+    \end{lemma}
+    \begin{lemma}
+        For any permutation matrix $P$, $||P_G|| = 1$.
+    \end{lemma}
+    We will try to rewrite
+    $$M_F = (\mathbf{I}_N \otimes M_H) \cdot P_G \cdot (\mathbf{I}_N \otimes M_H)$$
+    in the form $\frac{1-\lambda}{N}J_F + E$.
+    Recall that we cab rewrite $M_H$ as follows:
+    $$M_H = (1-\lambda_H) \cdot \frac{J_D}{D} + \lambda_H \cdot E_H$$
+    Where $||E_H|| \leq 1$. This gives us:
+    \begin{align*}
+    \mathbf{I}_N \otimes M_H &= (1-\lambda_H)(\frac{\mathbf{I}_N \otimes J_D}{D}) + \lambda_H \cdot (\mathbf{I}_N \otimes E_H)
+    \end{align*}
+    Which allows us to rewrite $M_F$
+    \begin{align*}
+        M_F &= (\mathbf{I}_N \otimes M_H) \cdot P_G \cdot (\mathbf{I}_N \otimes M_H)\\
+        &= [(1-\lambda_H)(\frac{\mathbf{I}_N \otimes J_D}{D}) + \lambda_H \cdot (\mathbf{I}_N \otimes E_H)] \cdot P_G \\&\qquad\cdot [(1-\lambda_H)(\frac{\mathbf{I}_N \otimes J_D}{D}) + \lambda_H \cdot (\mathbf{I}_N \otimes E_H)]
+    \end{align*}
+    We will distribute the above to get:
+    \begin{align*}
+        &= (1-\lambda_H)^2(\mathbf{I}_N \otimes \frac{J_D}{D}) \cdot P_G (\mathbf{I}_N \otimes \frac{J_D}{D})\\&+(1-\lambda_H) \cdot \lambda_H \cdot \mathbf{I}_N \otimes \frac{J_D}{D}) \cdot P_G \cdot (\mathbf{I}_N \otimes E_H)\\&+\lambda_H(1-\lambda_H) \cdot (\mathbf{I}_N \otimes E_H) \cdot P_G \cdot (\mathbf{I}_N \otimes \frac{J_D}{D})\\&+ \lambda_H^2 \cdot (\mathbf{I}_N \otimes E_H) \cdot P_G \cdot (\mathbf{I}_N \otimes E_H)
+    \end{align*}
+    We focus on only the first term, we label the subsequent terms as $E^1, E^2, E^3$.
+    
+    \begin{align*}
+    ||E^1|| &= (1-\lambda_H) \cdot \lambda_H \cdot ||(\mathbf{I}_N \otimes \frac{J_D}{D}) \cdot P_G \cdot (\mathbf{I}_N \otimes E_H)||\\
+    &\leq (1-\lambda_H) \cdot \lambda_H \cdot ||(\mathbf{I}_N \otimes \frac{J_D}{D})||\cdot || P_G ||\cdot ||(\mathbf{I}_N \otimes E_H)||\\
+    &\leq (1-\lambda_H) \cdot \lambda_H \cdot 1 \cdot 1 \cdot 1
+    \end{align*}
+    This is the same for all other error terms where we get that:
+    \begin{itemize}
+        \item $||E^2|| \leq \lambda_H \cdot (1-\lambda_H)$
+        \item $||E^3|| \leq \lambda_H^2$
+    \end{itemize}
+    We know have:
+    \begin{align*}
+    M_F&= (1-\lambda_H)^2(\mathbf{I}_N \otimes \frac{J_D}{D}) \cdot P_G (\mathbf{I}_N \otimes \frac{J_D}{D}) + \tilde{E}
+    \end{align*}
+    We know that:
+    \begin{align*}
+    ||\tilde{E}|| &= || E^1 + E^2 + E^3||\\
+    &\leq ||E^1|| + ||E^2|| + ||E^3||\\
+    &= \lambda_H \cdot (1-\lambda_H) +\lambda_H(1-\lambda_H) + \lambda_H^2\\
+    &= 2\lambda_H - \lambda_H^2\\
+    &= 1-(1-\lambda_H)^2
+    \end{align*}
+
+    In $G \circledcirc $ (Complete graph), If, $u,v$ are connected in $G$, then the cloud is connected to every vertex in the $v$ cloud as a result of taking:
+    $$A_G \otimes J_D = (I_N \otimes J_N) \cdot P_G \cdot (I_N \otimes J_N)$$
+    Once again we go back to write:
+    \begin{align*}
+    M_F &= (1-\lambda_H)^2 \cdot (I_N \otimes \frac{J_D}{D})\cdot P_G \cdot (I_N \otimes \frac{J_D}{D}) + \tilde{E}\\
+    &= (1-\lambda_H)^2 \cdot \frac{1}{D^2} \cdot (A_G \otimes J_D) + \tilde{E}
+    \end{align*}
+    By linear algebra lemma 1: $M_G = (1-\lambda_G)\cdot \frac{J_N}{N} + \lambda_G \cdot E_G$, and also that $A_G/D = M_G$. Therefore we can write:
+    \begin{align*}
+    M_F&= (1-\lambda_H)^2 \cdot [((1-\lambda_G) \cdot \frac{J_N}{N} + \lambda_G \cdot E_G) \otimes \frac{J_D}{D}] + \tilde{E}\\
+        &= (1-\lambda_H)^2(1-\lambda_G) \cdot (\frac{J_N \otimes J_D}{ND}) + (1-\lambda_H)^2 \cdot \lambda_G \cdot [E_G \otimes \frac{J_D}{D}] + \tilde{E}\\
+        &= (1-\lambda_H)^2(1-\lambda_G) \cdot \frac{J_{ND}}{ND} + E^5
+\end{align*}
+
+We bound $||E^5|| \leq ||(1-\lambda_H)^2 \cdot \lambda_G \cdot (E_G \otimes \frac{J_D}{D})|| + ||\tilde{E}||$ which gives us:
+$$||E^5|| \leq (1-\lambda_H)^2 \lambda_G + 1 - (1-\lambda_H)^2\\$$
+$$1-(1-\lambda_H)^2 \cdot (1-\lambda_G)$$
+$$M_F = (1-\lambda^*) \cdot \frac{J_{ND}}{ND} + \lambda^* \cdot E$$.
+By lemma $LA$ lemma 1, that $M_F$ is a $(ND, D_1^2, \lambda^*)$
+\bigskip
+
+\textbf{Takeaways:}
+\begin{itemize}
+    \item Zig-Zag can be seen as a product of "nice" matrices.
+    \item $G \circledcirc H \approx G \circledcirc$ complete graph + error term.
+\end{itemize}
 \end{document}
