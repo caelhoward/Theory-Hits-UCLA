@@ -588,5 +588,23 @@ By lemma $LA$ lemma 1, that $M_F$ is a $(ND, D_1^2, \lambda^*)$
 \begin{itemize}
     \item Zig-Zag can be seen as a product of "nice" matrices.
     \item $G \circledcirc H \approx G \circledcirc$ complete graph + error term.
+    \item $G \circledcirc H$ is an $(ND, D_1^2, 1-(1-\lambda_H)^2(1-\lambda_G))$-Graph
 \end{itemize}
+
+\section{Summary}
+Recall: Given input $G,s,t$, output: Are $s,t$ connected.
+\bigskip
+
+\textbf{Idea:} If every connected component of $G$ has degree $D$, second largest eigenvalue $\leq \lambda$, then we can solve $USTCON$ in space $O((\log D) \cdot \log_{1/\lambda}N)$
+\subsection{Instantiation}
+\textbf{Reingold's Algorithm}: Fix a graph $H:(B^4,B,\frac{1}{4})$ for some constant $B$.
+\begin{enumerate}
+    \item Convert $(G,s,t) \longrightarrow (G_0,s_0,t_0)$ where $G_0$ is a $B^2$-regular graph. We can do this by just adding extra self loops to make it $B^2$-regular.
+    \item For $k=1,...,L:$
+    \begin{enumerate}
+        \item $G_k \leftarrow G_{k-1}^2 \circledcirc H$. Following the change, the new graph still has degree $B^2$ since $D_1$ in $H$ is $B$.
+        \item $G_k$ has $N \cdot B^{4(k-1)}$ with degree $B^2$. More succinctly, $G_k$ is an $(B^{4(k-1)},_)$-graph
+    \end{enumerate}
+    \item Solve Connectivity on $G_2$ between vertices $s_2, t_l$ using brute-force search.
+\end{enumerate}
 \end{document}
