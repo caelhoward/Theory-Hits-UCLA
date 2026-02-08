@@ -1,0 +1,10 @@
+# Ignore all files by default
+*
+
+# Include only .tex and .pdf files
+!*.tex
+!*.pdf
+
+# But include subdirectories so we can traverse them
+!*/
+!.gitignore
