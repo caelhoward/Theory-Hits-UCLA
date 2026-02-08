@@ -1,0 +1,217 @@
+\documentclass[11pt]{article}
+
+% Prefix for numedquestion's
+\newcommand{\questiontype}{Question}
+
+
+% Use this if your "written" questions are all under one section
+% For example, if the homework handout has Section 5: Written Questions
+% and all questions are 5.1, 5.2, 5.3, etc. set this to 5
+% Use for 0 no prefix. Redefine as needed per-question.
+\newcommand{\writtensection}{0}
+
+\usepackage{amsmath, amsfonts, amsthm, amssymb}  % Some math symbols
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{dsfont}
+
+\newtheorem{theorem}{Theorem}[section]
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+
+\usepackage{centernot}
+\usepackage{mathtools}
+
+\usepackage{enumitem}
+
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\section{Sensitivity Conjecture}
+\begin{theorem}[Sensitivity Conjecture]
+    Consider an $n$ dimensional hypercube, $H_n$ where each vertex is represented by a length $n$ bitstring and any two vertices share an edge iff they have a different bit at only 1 index. For any set $S$ of the vertices of $H_n$ where $|S| \geq 2^{n-1}+1$:$$\Delta(S) \geq \sqrt{n}$$
+    In other words, the highest degree of a vertex in any subset including more than half of the vertices in the hypercube is at least the square root of the dimension of the hypercube.
+\end{theorem}
+Furthermore, this root $n$ is actually a tight bound.
+\bigskip
+
+\begin{lemma}
+For any graph $G$, let $A_G$ be the adjacency matrix for $G$. The following holds:
+$$|\lambda_1(A_G)| \leq \Delta(G)$$
+Or for any graph, the largest eigenvalue is at most the max degree of the graph.
+\end{lemma}
+This generalizes the statement if spectral graph theory that says that if a graph $G$ is $D-$regular, thenn all eigenvalues are less than or equal to $D$. The intuition behind this is that the normalized version of a D-regular graph has eigenvalue at most $1$ so dividing the matrix by $D$ results in eigenvalue at most $D$ for $A_G$.
+\begin{proof}
+    Suppose $v$ is an eigenvector with eigenvalue $\lambda$. We have that $$A_G \cdot v = \lambda \cdot v$$
+    The proof follows from the proof in the previous lectures. Assume $v_i$ is the largest entry in eigenvector $v$. We have 
+    \begin{align*}
+    |\lambda| \cdot |v_i| &= \sum_j A_{ij} \cdot v_j\\
+    &\leq |v_i| \cdot \sum_j A_{ij}\\
+    &\leq |v_i| \cdot D
+    \end{align*}
+\end{proof}
+We extend this proof to allow for an adjacency matrix to have both positive and negative entries denoting an edge between two nodes
+\bigskip
+
+\textbf{Signed-Adjacency Matrix:} A matrix $B$ is a "signed-adjacency matrix" of an undirected graph $G$ if the following holds:
+\begin{itemize}
+    \item $B$ is symmetric
+    \item $
+B_{ij} =
+\begin{cases}
+0, & (i,j)\notin E,\\
+\pm 1, & (i,j)\in E.
+\end{cases}
+$ $\quad$ Where $E$ denotes the edges of $G$,
+\end{itemize}
+Since the proof holds identically for signed-adjacency matrices, we can make the following claim:
+\begin{lemma}
+    If $A_G$ is a signed-adjacency matrix for graph $G$:$$|\lambda_1(A_G)| \leq \Delta(G)$$
+\end{lemma}
+The proof is pretty much the same as above but is done below:
+\begin{proof}
+    Consider eigenvector $v$ with eigenvalue $\lambda$. We can rewrite matrix multiplication as follows:
+    $$A_G \cdot v = \lambda \cdot v$$
+    Now consider the entry of $v$ with the largest absolute value $v_i$. We know that:
+    $$|\lambda \cdot v_i| = |\sum_j A_G[i,j] \cdot v_j|$$
+    We can argue the following:
+    \begin{align*}
+        |\lambda| \cdot |v_i| &= \sum_j |A_G[i,j]| \cdot |v_j|\\
+        &\leq \sum_j |A_G[i,j]| \cdot |v_i|\\
+        &\leq D \cdot |v_i|\\
+        |\lambda| &\leq D
+    \end{align*}
+\end{proof}
+We now have the necessary spectral graph theory lemma's to approach the problem.
+\subsection{Cauchy Interlacing and Principal Submatrices}
+We will consider the matrix $H_n$ that represents the adjacency matrix of the hypercube of $n$ dimensions. We define the \textbf{Principal Submatrix} of an $n \times n$ square matrix $S$ as the submatrix that is obtained by deleting the $i^{th}$ row and column from $S$. The main idea is to demonstrate that a principal submatrix of $H_n$ that keeps $2^{n-1}+1$ or more rows and columns has largest eigenvalue at least $\sqrt{n}$. The plan is as follows:
+\begin{enumerate}
+    \item Pick a "magical" signing $B_n$.
+    \item Compute the eigenvalues of $B_n$
+    \item Use linear algebra to say something about $\lambda(B_{S,S})$ (The principal submatrix of $B_N$)
+\end{enumerate}
+\subsubsection{Cauchy Interlacing}
+\textbf{Cauchy Interlacing} is a lemma that states we have a real symmetric matrix $M$, and generate a principal submatrix $M_{-1}$ with the $i^{th}$ row and column removed, the eigenvalues of $M_{-1}$ interlace the eigenvalues of $M$. In other words:
+$$\lambda_1(M) \geq \lambda_1(M_{-1}) \geq \lambda_2(M) \geq \lambda_2(M_{-1}) \geq ... \geq \lambda_{n-1}(M_{-1}) \geq \lambda_n(M)$$
+We do not prove this here, but use the statement to prove the Sensitivity Conjecture.
+\bigskip
+
+Extending on this idea, we can make a claim about the eigenvalues of $M_{-2}$, the principal submatrix of $M$ with two rows and columns removed. Relative to the eigenvalues of $M_{-1}$, they interlace them similarly to how $M_{-1}$'s eigenvalues interlace $M$'s. We generalize it here:
+\begin{theorem}[Cauchy Interlacing Theorem]
+    $B$ is an $N \times N$ symmetric matrix and $C$ is a $M \times M$ principal submatrix of $B$:
+    $$\lambda_N(B) \leq \lambda_{N-1}(B) \leq ... \leq \lambda_1(B)$$
+    $$\lambda_M(C) \leq \lambda_{M-1}(C) \leq ... \leq \lambda_1(C)$$
+    Then we have that, $\lambda_{N-M+i}(B) \leq \lambda_i(C) \leq \lambda_i(B)$
+\end{theorem}
+Suppose $B$ is a signing of $H_n$, then it has dimensions $2^n \times 2^n$ for $N = 2^n$. We want a lower bound on $\lambda(B_{S,S})$ for all $|S| \geq 2^{n-1} + 1$.
+\begin{lemma}
+If $B$ is a signing of $H_n$ then $\forall S, |S| = 2^{n-1}+1$, $$\lambda_{2^{n-1}}(B)=\lambda_{2^{n}-(2^{n-1}+1)+1}(B) \leq \lambda_1(B_{S,S}) \leq \lambda_1(B)$$
+In otherwords, the $2^{n-1}$'th eigenvalue is the lower bound of the highest degree vertex in $S$.
+\end{lemma}
+The goal is therefore to find a matrix $B_n$ of $H_n$ such that:
+$$\sqrt{n} \leq \lambda_{2^{n-1}}(B_n)$$
+\subsection{Constructing $B_N$}
+First, we will demonstrate what happens with a normal adjacency matrix for $H_n$. We define $H_n$ as follows:
+$$H_N[i \in \{0,1\}^N, j \in \{0,1\}^N] = \begin{cases}
+1, & i,j \text{ Differ in one location.}\\
+0, & \text{ Otherwise }
+\end{cases}$$
+For a non-signed matrix for $H_n$, the eigenvalues are $-2, \_ , \_ , 2$. The matrix for $n=2$ looks something along the lines of:
+$$H_2 = \begin{bmatrix}
+0 & 1 & 1 & 0\\
+1 & 0 & 0 & 1\\
+1 & 0 & 0 & 1\\
+0 & 1 & 1 & 0
+\end{bmatrix}$$
+We can recursively build $H_3$ by observing that we are essentially connecting two copies of $H_2$ together, and then drawing $N$ edges between the two copies if and only if the two vertices differ in a single bit. Since the two copies represent the last $N-1$ bits being the same, we can represent $H_3$ as follows:
+$$H_3 = \begin{bmatrix}
+H_2 & I_4\\
+I_4 & H_2
+\end{bmatrix}$$
+Where $I$ is the identity matrix of size $2^{n-1} \times 2^{n-1}$. Generalizing this, we have:
+$$H_n = \begin{bmatrix}
+H_{n-1} & I_{2^{n-1}}\\
+I_{2^{n-1}} & H_{n-1} 
+\end{bmatrix}$$
+The eigenvalues of these types of adjacency matrices have $n\choose{r}$ eigenvalues of magnitude $n(1-\frac{1}{n})^r$ which drop off exponentially.
+\subsection{Finalizing Proof}
+\begin{lemma}
+    $\forall n, \exists$ a signing $B_n$ of $H_n$ such that:
+    \begin{enumerate}[label=(\alph*)]
+        \item $B_n^2 = n \cdot I_{2^n}$
+        \item Trace$(B_n) = 0$
+    \end{enumerate}
+    Furthermore, if we prove the above, we prove the Sensitivity Conjecture.
+\end{lemma}
+\textbf{Claim:} If $B_n$ satisfies the above two properties, then $\lambda_{2^{n-1}}(B_n) = \sqrt{n}$.
+\begin{proof}
+    Firstly, we know that squaring a matrix squares the eigenvalues of the matrix. Since $n \cdot I_{2^n}$ has $n$ eigenvalues of $n$, the eigenvalues of $B_n$ must be $\pm \sqrt{n}$. Since the trace of a matrix is the sum of its eigenvalues, and the trace of $B_n$ is $0$, we know that half the eigenvalues must be $\sqrt{n}$ and half must be $-\sqrt{n}$. Therefore, the $2^{n-1}$'th largest eigenvalue must be $\sqrt{n}$. This completes the claim as it shows that $H_n$ must have largest degree at least $\sqrt{n}$ in any subset of size $2^{n-1}+1$.
+\end{proof}
+We construct the signing $B_n$ inductively with a recursive structure. Firstly, we have for $N=1$:
+$$A_{H_1} = \begin{bmatrix}
+    0 & 1\\
+    1 & 0
+\end{bmatrix}$$
+Here we can clearly say that $A_{H_1}^2 = I_1$ and that the trace is $0$, satisfying the inductive property. Furthermore, we know that any proper signing satisfies the Trace = $0$ property as there are no self loops in the hypercube. For $N = 2$, we have:
+$$B_2 = \begin{bmatrix}
+    A_{H_1} & I_2\\
+    I_2 & -A_{H_1}
+\end{bmatrix}$$
+Firstly, we know this is a valid signing of $H_2$ as the non-zero entries correspond to edges in the hypercube as we saw earlier. We just show that $B_2^2 = 2 \cdot I_{2^1}$.
+\begin{align*}
+    B_2^2 &= \begin{bmatrix}
+    A_{H_1} & I_2\\
+    I_2 & -A_{H_1}
+\end{bmatrix} \cdot \begin{bmatrix}
+    A_{H_1} & I_2\\
+    I_2 & -A_{H_1}
+\end{bmatrix}\\
+&= \begin{bmatrix}
+    A_{H_1}^2 + I_2 & A_{H_1} - A_{H_1}\\
+    -A_{H_1} + A_{H_1} & I_2 + A_{H_1}^2
+\end{bmatrix}\\
+&= \begin{bmatrix}
+    2 \cdot I_2 & 0\\
+    0 & 2 \cdot I_2
+\end{bmatrix} = 2 \cdot I_4
+\end{align*}
+This generlizes for any $k+1$ as follows:
+$$B_{k+1} = \begin{bmatrix}
+    B_k & I_{2^k}\\
+    I_{2^k} & -B_k
+\end{bmatrix}$$
+We can show inductively that $B_{k+1}^2 = (k+1) \cdot I_{2^{k+1}}$ assuming $B_k^2 = k \cdot I_{2^k}$.
+\begin{align*}
+    B_{k+1}^2 &= \begin{bmatrix}
+    B_k & I_{2^k}\\
+    I_{2^k} & -B_k
+\end{bmatrix} \cdot \begin{bmatrix}
+    B_k & I_{2^k}\\
+    I_{2^k} & -B_k
+\end{bmatrix}\\
+&= \begin{bmatrix}
+    B_k^2 + I_{2^k} & B_k - B_k\\
+    -B_k + B_k & I_{2^k} + B_k^2
+\end{bmatrix}\\
+&= \begin{bmatrix}
+    (k+1) \cdot I_{2^k} & 0\\
+    0 & (k+1) \cdot I_{2^k}
+\end{bmatrix} = (k+1) \cdot I_{2^{k+1}}
+\end{align*}
+Proving the lemma and the proof!
+\subsection{Summary}
+The proof of the Sensitivity Conjecture is as follows:
+\begin{enumerate}
+    \item Suffices to have a signing such that $\forall S, |S| = 2^{n-1}+1$, $\lambda_1(B_{S,S}) \geq \sqrt{n}$
+    \item Suffices by Cauchy Interlacing: Find a signing $B_n$ such that\\$\lambda_{2^{n-1}}(B_n) \geq \sqrt{n}$.
+    \item Suffices to have a signing $B_n, B_n^2 = n \cdot I_{2^n}$ and Trace$(B_n) = 0$
+    \item Use recursive construction to build $B_n$.
+\end{enumerate}
+Remark: $\sqrt{n}$ is tight. $\exists S, |S| \geq 2^{n-1}+1$ st. $\Delta(H_n[S,S]) \leq \sqrt{n}$.
+$$S = \{x : f(x) \cdot par(x)=1\}$$
+Where $f$ is the following:
+$$f(x) = 1 \Longleftrightarrow \exists \text{ a column that is all 1's }: \bigvee_{j=1}^{k} \left( \bigwedge_{i=1}^{k} x_{ij} \right)$$
+\end{document}
