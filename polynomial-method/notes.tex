@@ -77,4 +77,89 @@ We can think of it as:
     a_i + b_i + c_i &\equiv 0 \mod 3
 \end{align*}
 This equation is satisifed when all $a_i = b_i = c_i$ or each value is unique.
+\subsection{Lower Bound on $r_3(\mathbb{F}_3^n)$}
+\begin{theorem}
+    $r_3(\mathbb{F}_3^n) \leq (2.76)^n = N^c$ for some $c < 1$.
+\end{theorem}
+\textbf{Proof Outline:} We are going to use the polynomial method which will aim to do the following:
+\begin{itemize}
+    \item Encode objects or desired solutions as polynomials
+    \item Use linear algebra (rank / dimension)
+    \item Use interpolation
+    \item Fast polynomial evaluation
+\end{itemize}
+Generally we will show that if there exists some large $3$AP free set, it implies that some property of identity tensor is violated.
+\begin{definition}
+    We say that a \textbf{Rank} of a matrix $M$ ($rank(M)$) is the number of linearly independent columns or number of linearly independent rows of the matrix. Another way to think about it is the number of rank $1$ matrices that add up to $M$:
+    $$Rank(M) = \underset{r}{\min} \{ M = M_1 + ... + M_r\}$$
+    Where all $M_i$ are rank 1 matrices. 
+\end{definition}
+Knowing that $rank(M) = r$, we can write $M$ as the following:
+$$M = f_1 g_1^T + ... + f_r g_r^T$$
+Where each $f_i$ represents one of the linearly independent columns and each $g_i$ represents one of the linearly independent rows. This decomposition has each $M_i = f_i \cdot g_i^T$. We can therefore redefine rank for matrices in $\mathbb{F}_3^{n \times n}$ as the following:
+\begin{align*}
+    Rank(M) = \min_{r} \Big\{  &\exists f_1, \ldots, f_r: [N] \longrightarrow \mathbb{F}_3, \\
+    &\exists g_1, \ldots, g_r: [N] \longrightarrow \mathbb{F}_3 \\
+    &\mid M(x,y) = f_1(x) g_1(y) + \cdots + f_r(x) g_r(y)\ \forall x,y \in [N]\Big\}
+\end{align*}
+
+We should also think of matrices as a function that takes in two inputs and outputs a value. Furthermore, for a tensor, we can think of it as a function that takes in three inputs and outputs a value. For tensor rank, the general notion is as follows:
+\begin{definition}
+    We say that a \textbf{Rank} of a tensor $T$ ($rank(T)$) is the number of rank 1 tensors that add up to $T$:
+    $$Rank(T) = \underset{r}{\min} \{ T = T_1 + ... + T_r\}$$
+    Where all $T_i$ are rank 1 tensors.
+\end{definition}
+We draw a parallel with the second definition of matrix rank and define the following for tensors:
+\begin{align*}
+    Rank(T) = \min_{r} \Big\{  &\exists f_1, \ldots, f_r: [N] \longrightarrow \mathbb{F}_3, \\
+    &\exists g_1, \ldots, g_r: [N] \longrightarrow \mathbb{F}_3, \\
+    &\exists h_1, \ldots, h_r: [N] \longrightarrow \mathbb{F}_3, \\
+    &\mid T(x,y,z) = f_1(x) g_1(y) h_1(z) + \cdots + f_r(x) g_r(y) h_r(z)\ \forall x,y,z \in [N]\Big\}
+\end{align*}
+You think of a rank one tensor as a function that can be written as a product of three functions, each of which takes in one of the three inputs. We will be interested in the following tensor:
+$$\mathbb{I}(x,y,z) = \begin{cases}  1 & \text{if } x=y=z\\
+0 & \text{otherwise} \end{cases}$$
+Firstly, we know that $rank(\mathbb{I}^{N \times N}) \leq N$ because we can write $\mathbb{I}$ as the sum of $N$ rank one tensors. Secondly, we know that $rank(\mathbb{I}^{N \times N \times N}) \leq N$ where $f_i(x) = g_i(y) = h_i(z) = 1$ if $x=y=z=i$ and $0$ otherwise. For each $f_i, g_i, h_i$ we just say $f_i(x) = 1$ if $x=i$ and $0$ otherwise.
+\subsubsection{Thought Experiment}
+Say we have a matrix $M$ which we think about as a function $M(x,y)$. If two parties are trying to figure out the value of $M[x,y]$ where one party has $x$ and the other has $y$, one easy protocol is having the first party send $x$ to the second party and having the second party compute $M[x,y]$. However, if $M$ has low rank, we can do better. We can write $M$ as the sum of $r$ rank one matrices:
+$$M = f_1 g_1^T + ... + f_r g_r^T$$
+In this case, we can have Alice (party 1) send $f_i(x)$ for all $i$ to Bob. Since $f_i(x)$ is either $[0,1,2]$, the complexity of this protocol is just $O(r)$ opposed to $O(\log N)$.
+\bigskip
+
+Consider the case with three parties trying to compute the tensor $M^{n \times n \times n}$. If $M$ has low rank, we can write $M$ as the sum of $r$ rank one tensors:
+$$M = f_1 g_1 h_1 + ... + f_r g_r h_r$$
+In this case, we can have Alice and Bob send $f_i(x)$ and $g_i(y)$ for all $i$ to Charlie, and Charlie can compute $M[x,y,z]$ by computing $f_i(x) g_i(y) h_i(z)$ for all $i$. The complexity of this protocol is just $O(r)$ opposed to $O(\log N)$ once more.
+\subsubsection{New Notion of Tensor Rank}
+We define a new notion of tensor rank called Slice Rank. To motivate this, we make a continuation of the previous thought experiment where each round, two players can get together and send information to the third player. We define the protocol as:
+\begin{itemize}
+    \item Alice has $x$, Bob has $y$, and Charlie has $z$.
+    \item Start with Alice and Bob in a room and Charlie in another room. Alice and Bob can talk to each other but not to Charlie.
+    \item In other rounds, any two players can get together and talk to each other but not to the third player.
+\end{itemize}
+To formalize this idea, we define the following:
+\begin{definition}
+    We say that a \textbf{Slice Rank} of a tensor $T$ ($srank(T))$\\
+
+    \[
+    \mathrm{SRank}(T)
+    =
+    \min \left\{ r :
+    \begin{array}{l}
+    \exists\ r_1,r_2,r_3 \text{ with } r_1+r_2+r_3=r, \\[4pt]
+    f_1,\dots,f_{r_1} : [M]\to\mathbb{F}, \\
+    \widetilde f_1,\dots,\widetilde f_{r_1} : [M]\times[M]\to\mathbb{F}, \\[4pt]
+    g_1,\dots,g_{r_2} : [M]\to\mathbb{F}, \\
+    \widetilde g_1,\dots,\widetilde g_{r_2} : [M]\times[M]\to\mathbb{F}, \\[4pt]
+    h_1,\dots,h_{r_3} : [M]\to\mathbb{F}, \\
+    \widetilde h_1,\dots,\widetilde h_{r_3} : [M]\times[M]\to\mathbb{F}, \\[6pt]
+    \text{such that } \\
+    \begin{aligned}
+    T(x,y,z) = \sum_{i=1}^{r_1} f_i(x)\widetilde f_i(y,z) + \sum_{i=1}^{r_2} g_i(y)\widetilde g_i(x,z) \\
+    \quad + \sum_{i=1}^{r_3} h_i(z)\widetilde h_i(x,y)
+    \end{aligned}
+    \end{array}
+    \right\}.
+    \]
+\end{definition}
+We end this lecture by explaining that $SRank(T) \leq Rank(T)$ since we can just define $\widetilde{f_i}$ as $g_i \cdot h_i$.
 \end{document}
