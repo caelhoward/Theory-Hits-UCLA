@@ -1,0 +1,39 @@
+\documentclass[11pt]{article}
+
+% Prefix for numedquestion's
+\newcommand{\questiontype}{Question}
+
+
+% Use this if your "written" questions are all under one section
+% For example, if the homework handout has Section 5: Written Questions
+% and all questions are 5.1, 5.2, 5.3, etc. set this to 5
+% Use for 0 no prefix. Redefine as needed per-question.
+\newcommand{\writtensection}{0}
+
+\usepackage{amsmath, amsfonts, amsthm, amssymb}  % Some math symbols
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{dsfont}
+
+\newtheorem{theorem}{Theorem}[section]
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+
+\usepackage{centernot}
+\usepackage{mathtools}
+
+\usepackage{enumitem}
+
+\setlength{\parindent}{0pt}
+
+\begin{document}
+\section{Tree Evaluation}
+Consider the function:
+$$f: \{0,1\}^k \times \{0,1\}^k \rightarrow \{0,1\}^k$$
+We aim to find the amount of space needed, given $x_1,...,x_n \in \{0,1\}^k$ for $n=2^k$, the root value of the tree defined where each inner node is calculated as:
+$$u.val = f(u.left.val, u.right.val)$$
+
+
+\end{document}

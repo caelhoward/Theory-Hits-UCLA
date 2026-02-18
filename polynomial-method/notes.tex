@@ -162,4 +162,149 @@ To formalize this idea, we define the following:
     \]
 \end{definition}
 We end this lecture by explaining that $SRank(T) \leq Rank(T)$ since we can just define $\widetilde{f_i}$ as $g_i \cdot h_i$.
+\section{Lecture 9}
+First, we define a tensor assosiated with $3AP$ sets, and show that if there exists a large $3AP$ free set, some property of the tensor is violated. Consider the following function for checksum:
+\begin{align}
+    CS: \mathbb{F}_3^n \times \mathbb{F}_3^n \to \mathbb{F}_3 \rightarrow \{0,1\}\\
+    CS(x,y,z) = \begin{cases} 1 & \text{if } x+y+z = 0\\
+    0 & \text{otherwise} \end{cases}
+\end{align}
+For this function, we can think of it like a cube with $1$'s along the diagonal, and $0$'s in other locations unless the three inputs are all different, or all sum to $0$ mod $3$. Consider a subset $S \subseteq \mathbb{F}_3^n$ such that $S$ is a $3AP$ free set, meaning no $x+y+z=0$ for distinct $x,y,z \in S$. This implies that $CS(x,y,z) = 1$ if and only if $x=y=z$ (We think of the subset $S$ as taking a subcube of the tensor by removing the $i$th element row). Because of this, the remaining tensor representing $S$ must be the identity tensor. In otherwords:
+$$CS_{S \times S \times S} = \mathbb{I}^{S \times S \times S}$$
+\subsection{Properties of Identity Tensor}
+We will prove the three following properties:
+\begin{enumerate}
+    \item $SRank(\mathbb{I}_{M\times M\times M}) = M$
+    \item $SRank(\text{ sub-tensors }) \leq SRank(\text{ main tensor })$
+    \item $SRank(CheckSum) \leq 3^{cn}$ where $(c < 1)$
+\end{enumerate}
+This is sufficient to demonstrate that there does not exist a big $S$. Since $CS_{S\times S\times S} = |S|$ from property $1$. Then we know that $|S| \leq SRank(CS)$ by 2. If we bound $SRank(CS)$, we therefore have a bound for $|S|$.
+\subsubsection{Bounding Slice Rank of Identity Tensor}
+We aim to show that the slice rank of the identity tensor is $M$. Firstly, we know that for matrices we can easily show that $I_M$ has rank $M$ since there are $M$ linearly independent rows/columns. We, however, cannot extend this argument to Tensors so we try another approach.
+\lemma{$SRank(\mathbb{I}_{M \times M \times M}) = M$}
+\bigskip
+
+First, consider the following tensor $T: [M] \times [M] \times [M] \rightarrow \{0,1\}$
+$$T(x,y,z) = \begin{cases} 1 & \text{if } x+y+z \text{ is even}\\0 & \text{otherwise} \end{cases}$$
+The above has a $SRank$ of 2:
+$$T(x,y,z) = \mathds{1}(x \text{ is even}) \cdot \mathds{1}(y+z \text{ is even}) + \mathds{1}(x \text{ is odd })\cdot \mathds{1}(y+z \text{ is odd })$$
+We cannot extend proofs that $I_{M \times M}$ has rank $M$ that rely on linear independence or eigenvalues. To come up with a proof that extends to tensors, we use the decomposition definition where we can rewrite the matrix as:
+$$I_{d} = \sum_i^{M-1}f_i(x) \cdot g_i(y)$$
+Recall that we can think of each $f_i(x) \cdot g_i(y)$ like two vectors $f_i \cdot g_i^\top$. Therefore, there must exist a function $u: [M] \rightarrow \mathbb{R}$ that is perpendicular to all $f_1,f_2,...,f_{M-1}$. Therefore, we know that:
+\begin{align*}
+    u^\top \mathds{I}_d &= u^\top (\sum_i^{M-1}f_i \cdot g_i^\top)\\
+    &= \sum_i^{M-1}(u^\top \cdot f_i) \cdot g_i^\top\\
+    &= 0
+\end{align*}
+However, this is a contradiction since the result should be $u^\top$. We extend this to tensors.
+\bigskip
+
+First we show that $SRank(\mathds{I}_{M\times M \times M}) \leq M$. This is because we can rewrite the tensor as follows:
+$$\mathds{I}_{M \times M \times M} = \sum_{a=1}^M \mathds{1}(x=a) \cdot \mathds{1}(y=a) \cdot \mathds{1}(z=a)$$
+Now we show that $SRank(\mathds{I}_{M\times M \times M}) \geq M$:
+\begin{proof}
+Suppose $SRank(I) < M$. Then we can write it as follows:
+\begin{align*}
+I(x,y,z) = \sum_{i=1}^{r_1} f_i(x)\widetilde f_i(y,z) + \sum_{i=1}^{r_2} g_i(y)\widetilde g_i(x,z) \\
+    \quad + \sum_{i=1}^{r_3} h_i(z)\widetilde h_i(x,y)
+\end{align*}
+Where $r_1 + r_2 + r_3 = r$. First, we find a new "canceling" function $F$ such that $\langle f_i, F \rangle = 0$ for $i=1,...,r_1$ and $F$ has at least $M-r_1$ non-zero values. We argue that such an $F$ must always exist. This is because. First it follows that if a set of vectors has rank $r_1$ where $r_1 < M$, then there must be a function/vector that is perpendicular to it. We argue that one of these vectors must have at least $M-r_1$ nonzero entries. Note that the span of all vectors $f_i$ is at most $r_1$ and the span of all vectors not in the span is $M-r_1$. Since the perpendicular vectors span $M-r_1$, you must be able to find a vector with that many non-zero entries.
+
+$\quad$ We define a new matrix:
+\begin{align*}
+    G(y,z) &= \sum_{x\in [M]} I(x,y,z) \cdot F(x)\\
+    &= \sum_{x\in [M]}(\sum_{i=1}^{r_1} f_i(x)\widetilde f_i(y,z) + \sum_{i=1}^{r_2} g_i(y)\widetilde g_i(x,z) \\
+    &\quad + \sum_{i=1}^{r_3} h_i(z)\widetilde h_i(x,y))F(x)
+\end{align*}
+This is the matrix taken when we sum over all $x$ values. It is essentially the analog of the the $u^\top \cdot \mathds{I}_d$ from the matrix example. The resulting function is over just $y$ and $z$, giving us:
+\begin{align*}
+    G(y,z) &= \sum_{x\in [M]}\mathds{I}_d (x,y,z) \cdot F(x)\\
+        &= \sum_{i=1}^{r_2}g_i(y) (\sum_{x\in [M]}\widetilde{g_i}(x,z)\cdot F(x)) + \sum_{i=1}^{r_3}h_i(z)(\sum_{x\in [M]}\widetilde{h_i}(x,y)\cdot F(x))
+\end{align*}
+We can visualize this new matrix as follows:
+$$\begin{pmatrix}
+F(1) & 0 & \cdots & 0 \\
+0 & F(2) & \cdots & 0 \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \cdots & F(n)
+\end{pmatrix}$$
+This is because the original tensor is one ONLY when $x = y = z$ and a $0$ everywhere else. So therefore, taking the summation over all $x \in [M]$ should yield a $1$ only once in the new matrix, when the $y$ and $z$ values are equal to it. These $1$'s are then multiplied by $F(x)$ which results in the diagonal being $F(x)$.
+
+\quad As stated earlier, there are at least $M-r_1$ values of $F(x)$ that are non-zero. We analyze the rank of $G$. Firstly, the rank of $G$ must be equal to the number of entries on the diagonal. This follows since there are at least $M-r_1$ linearly independent rows, one for each non-zero entry. So we get the following:
+$$M-r_1 \leq Rank(G)$$
+Secondly, we know that the final equation turns $\widetilde{g_i}(x,z)$ into an equation just over $z$ and $\widetilde{h_i}(x,y)$ just over $y$. Because of this, we can rewrite it as $r_2 + r_3$ terms in the form of $f'_i(y)g'_i(z)$, which implies that:
+$$Rank(G) \leq r_2 + r_3$$.
+This equality gives us:
+\begin{align*}
+    M-r_1 &\leq Rank(G) \leq r_2 + r_3\\
+    M-r_1 &\leq r_2 + r_3\\
+    M &\leq r_1 + r_2 + r_3
+\end{align*}
+And since the assumption was that $r_1 + r_2 + r_3$ was at most $M-1$, we get a contradition, proving that the identity tensor must have slice rank at least $M$.
+\end{proof}
+\subsubsection{Bounding Slice of Subtensor}
+We show the following:
+\begin{lemma}
+    The if tensor $T$ has slice rank $M$, then any subtensor has slice rank at most $M$.
+\end{lemma}
+\begin{proof}
+The proof is very elementary, any decomposition satisfying:
+\begin{align*}
+    T(x,y,z) = \sum_{i=1}^{r_1} f_i(x)\widetilde f_i(y,z) + \sum_{i=1}^{r_2} g_i(y)\widetilde g_i(x,z) \\
+    \quad + \sum_{i=1}^{r_3} h_i(z)\widetilde h_i(x,y)
+    \end{align*}
+also holds for $(x,y,z) \in S \times S \times S$
+\end{proof}
+
+\subsubsection{Upperbound on $SRank(CSum)$}
+We prove the following:
+\begin{lemma}
+    For the function CheckSum, where:
+    $$CS(x,y,z) = \begin{cases}
+    1 \text{ if } x+y+z=0,\quad x,y,z \in \mathbb{F}_3^n\\
+    0 \text{ else.}
+    \end{cases}$$
+    the slice rank of $CS$ is $\leq 3^{cn} (c < 1)$
+\end{lemma}
+\begin{proof}
+    First, the input the the checksum function is $$(x,y,z) \in \mathbb{F}_3^n \times \mathbb{F}_3^n \times \mathbb{F}_3^n$$We want to think of it more so as:
+    $$CS((x_1,...,x_n), (y_1,...,y_n),(z_1,...,z_n))$$
+    Where in every coordinate we need to have $x_i + y_i + z_i = 0$. We rewrite it as:
+    \begin{align*}
+        CS(x,y,z) = \prod_{i=1...n} \mathds{1}(x_i + y_i + z_i = 0)
+    \end{align*}
+    If $x_i + y_i + z_i$ does not equal $0$, it is either 1 or 2. Consider the following cases where we square $x_i + y_i + z_i$. If the sum $\mod 3$ is 0, squaring it results in 0 still. However, if it is not zero, squaring both $1$ and $2$ yields $1$. We can therefore rewrite the above equation as:
+    $$CS(x,y,z) = \prod_{i=1...n} 1-(x_i+y_i+z_i)^2$$
+    Therefore, this representation write $CS$ as a polynomial of degree $2n$.
+    \bigskip
+
+    (Aside About Polynomials) Since I do not know about polynomials, I needed to look up seperate definitions to follow here. The degree of a polynomial is the highest sum of the degrees of any single monomial. So when we square $x_i + y_i + z_i$, we get a bunch of terms of degree $2$ like $x_i^2$ and $x_i \cdot y_i$. We multiply these terms across all $i=1,...,n$. So it total the final polynomial has terms that have degree at most $2n$.
+    \bigskip
+
+    We show that any polynomial of degree $2n$ has slice rank less than full. We expand the compact representation to get:
+    $$\sum C_{\bar{i},\bar{j},\bar{k}}\ x_1^{i_1} \cdot x_2 ^{i_2} \cdot ... \cdot z_{n-1}^{k_{n-1}} \cdot z_{n}^{k_{n}}$$
+    We are going to use the following shorthand to simplify the above:
+    $$\sum C_{\bar{i},\bar{j},\bar{k}}\ x^{\bar{i}} y^{\bar{j}} z^{\bar{k}}$$
+    Since the total degree of any term is at most $2n$ in total and each variable has degree $\leq 2$. We group these terms into three categories:
+    \begin{itemize}
+        \item Terms where $x's$ degree $\leq \frac{2n}{3}$
+        \item Terms where $y's$ degree $\leq \frac{2n}{3}$
+        \item Terms where $z's$ degree $\leq \frac{2n}{3}$
+    \end{itemize}
+    Since they are not disjoint, any term not in the first gets pushed to the second and so on. Consider all terms where $x's$ degree is $\leq \frac{2n}{3}$:
+    \begin{align*}
+    C_{\bar{i},\bar{j},\bar{k}} x^{\bar{i}}\cdot y^{\bar{j}} \cdot z^{\bar{k}}\\
+    \end{align*}
+    We group the each term based on the $x$ monomial. For example, we group all terms that have the $x$ monomial $x_1^1x_2^2x_3^2$. We get:
+    $$\sum_i x^{\bar{i}}\cdot (\sum_{\hat{i}, \hat{j},\hat{k}}C_{\bar{j},\bar{k}}\ y^{\bar{j}}\cdot z^{\bar{k}})$$
+    Observe that each of these is a slice in the form $f_i(x) \cdot \widetilde{f}_i(y,z)$. Therefore, we can bound $r_1$ as the number of ways we can sum the degrees of $x_1,...,x_n$ to at most $2n/3$. This part is not proven in lecture, however, he uses the following:
+    \begin{lemma}
+    The number of ways that you can form tuples $(i_1,i_2,...,i_n)$ such that $i_1 + i_2 + ... + i_n \leq \frac{2n}{3}$ and every $0 \leq i_k \leq 2$ is less than or equal to $(2.757)^n$. 
+    \end{lemma}
+    This implies that $r_1 \leq (2.757)^n$. The proof can extend to also show that $r_2,r_3$ have the same upper bound which implies:
+    $$SRank(CS) \leq 3 \cdot 2.757^n$$
+
+    Note that the beauty in this proof is not only getting a clean closed form solution to the check sum protocol, but beyond that having the exponents of every variable be either $0,1,2$ which are exactly the digits of $\mathbb{R}_3$ which allows for this clean translation into slice rank. 
+\end{proof}
+ 
 \end{document}

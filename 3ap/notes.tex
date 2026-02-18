@@ -105,7 +105,7 @@ We fix a radius $R$ and look at all points which have integer coordinates and li
 We now want to map these coordinates $x \in [k]^d$ to the integers such that the desired properties hold. Formally, we want to find a mapping $f: S_R \rightarrow \mathbb{Z}_N$ where the following holds:
 $$f(x) + f(y) = 2 \cdot f(z) \Leftrightarrow x + y = 2z$$
 \subsection{Mapping the Integers to $[k]^d$}
-We are trying to map vectors to integers such that adding the integers corresponds to adding the vectors. To do this, we use bitvectors, in otherwords, we map the integers to binary representations of their numbers of $d$ bits. For formally we have:
+We are trying to map vectors to integers such that adding the integers corresponds to adding the vectors. To do this, we map the integers to base $2k+1$ representations of their numbers of length $d$. More formally we have:
 $$x = (x_1,x_2,..., x_d)$$
 Representing $x$ as a base $2k + 1$ representation of a number. In otherwords:
 $$f(x) = \sum_{i=1}^d x_i \cdot (2k+1)^{i-1}$$
